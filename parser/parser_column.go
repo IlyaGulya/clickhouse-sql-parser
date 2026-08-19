@@ -585,6 +585,19 @@ func (p *Parser) parseColumnExpr(pos Pos) (Expr, error) { //nolint:funlen
 	if p.keywordIsSelectItemIdentifier() ||
 		(p.matchTokenKind(TokenKindKeyword) &&
 			(p.peekIsEndOfStatement() || p.peekIsExpressionContinuation())) {
+		// A prefix operator after CASE can start the operand of the simple
+		// form. Only the WHEN after an operand of any length tells
+		// `CASE -1 WHEN 1 THEN 5 END` from the column name in `CASE - 1`,
+		// and no fixed lookahead reaches it. Try the CASE reading and fall
+		// back to the column name, as the INTERVAL case below does.
+		if p.matchKeyword(KeywordCase) {
+			savedState := p.lexer.saveState()
+			caseExpr, err := p.parseColumnCaseExpr(pos)
+			if err == nil {
+				return caseExpr, nil
+			}
+			p.lexer.restoreState(savedState)
+		}
 		return p.parseAnyKeyword()
 	}
 	switch {
