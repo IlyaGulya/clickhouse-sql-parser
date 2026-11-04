@@ -516,6 +516,36 @@ func (a *AlterTableAddIndex) Accept(visitor ASTVisitor) error {
 	return visitor.VisitAlterTableAddIndex(a)
 }
 
+// AlterTableAddConstraint is ALTER TABLE ... ADD CONSTRAINT ... CHECK ...
+type AlterTableAddConstraint struct {
+	AddPos       Pos
+	StatementEnd Pos
+
+	Constraint  *ConstraintClause
+	IfNotExists bool
+}
+
+func (a *AlterTableAddConstraint) Pos() Pos {
+	return a.AddPos
+}
+
+func (a *AlterTableAddConstraint) End() Pos {
+	return a.StatementEnd
+}
+
+func (a *AlterTableAddConstraint) AlterType() string {
+	return "ADD_CONSTRAINT"
+}
+
+func (a *AlterTableAddConstraint) Accept(visitor ASTVisitor) error {
+	visitor.Enter(a)
+	defer visitor.Leave(a)
+	if err := a.Constraint.Accept(visitor); err != nil {
+		return err
+	}
+	return visitor.VisitAlterTableAddConstraint(a)
+}
+
 type ProjectionOrderByClause struct {
 	OrderByPos Pos
 	Columns    *ColumnExprList

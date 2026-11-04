@@ -12,6 +12,7 @@ type ASTVisitor interface {
 	VisitAlterTableFreezePartition(expr *AlterTableFreezePartition) error
 	VisitAlterTableAddColumn(expr *AlterTableAddColumn) error
 	VisitAlterTableAddIndex(expr *AlterTableAddIndex) error
+	VisitAlterTableAddConstraint(expr *AlterTableAddConstraint) error
 	VisitAlterTableAddProjection(expr *AlterTableAddProjection) error
 	VisitTableProjection(expr *TableProjection) error
 	VisitProjectionOrderBy(expr *ProjectionOrderByClause) error
@@ -286,6 +287,13 @@ func (v *DefaultASTVisitor) VisitAlterTableAddColumn(expr *AlterTableAddColumn) 
 }
 
 func (v *DefaultASTVisitor) VisitAlterTableAddIndex(expr *AlterTableAddIndex) error {
+	if v.Visit != nil {
+		return v.Visit(expr)
+	}
+	return nil
+}
+
+func (v *DefaultASTVisitor) VisitAlterTableAddConstraint(expr *AlterTableAddConstraint) error {
 	if v.Visit != nil {
 		return v.Visit(expr)
 	}

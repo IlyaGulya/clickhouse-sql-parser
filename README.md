@@ -7,6 +7,21 @@ The goal of this project is to build a ClickHouse SQL parser in Go with the foll
 - Beautify ClickHouse SQL format
 
 This project is inspired by [memefish](https://github.com/cloudspannerecosystem/memefish) which is a SQL parser for Spanner in Go.
+
+This maintained fork uses module `github.com/IlyaGulya/clickhouse-sql-parser`.
+It starts from the parser commit `8ee6ab233f70` that chgen used. Use the
+module path below; no `replace` directive is required.
+
+## CHECK constraints
+
+The parser accepts `ALTER TABLE ... ADD CONSTRAINT [IF NOT EXISTS] name CHECK expression`.
+The statement can also add a column and change `ORDER BY` in the same operation.
+Formatting keeps `CHECK`. Both traversal methods visit the check expression.
+`ASSUME`, `DROP CONSTRAINT`, and `MODIFY CONSTRAINT` are not supported.
+
+Custom `ASTVisitor` implementations must add `VisitAlterTableAddConstraint`.
+Implementations that embed `DefaultASTVisitor` inherit this method.
+
 ## How to use
 
 You can use it as your Go library or CLI tool, see the following examples:
@@ -17,7 +32,7 @@ You can use it as your Go library or CLI tool, see the following examples:
 package main
 
 import (
-    clickhouse "github.com/AfterShip/clickhouse-sql-parser/parser"
+    clickhouse "github.com/IlyaGulya/clickhouse-sql-parser/parser"
 )
 
 query := "SELECT * FROM clickhouse"
@@ -32,16 +47,10 @@ if err != nil {
 - Install clickhouse-sql-parser as a CLI tool
 
 
-On Linux:
+Use Go on Linux or macOS:
 
 ```bash
-$ go install github.com/AfterShip/clickhouse-sql-parser@latest
-```
-
-On macOS:
-
-```bash
-$ brew install clickhouse-sql-parser
+$ go install github.com/IlyaGulya/clickhouse-sql-parser@codex/source-copy-constraints
 ```
 
 Parse ClickHouse SQL into AST or format ClickHouse SQL:

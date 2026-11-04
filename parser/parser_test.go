@@ -188,6 +188,14 @@ func TestParser_InvalidSyntax(t *testing.T) {
 		// CREATE TABLE and the next clause in ALTER TABLE.
 		"CREATE TABLE t (a DateTime, b String) ENGINE = MergeTree ORDER BY a, b",
 		"ALTER TABLE t MODIFY ORDER BY a, b",
+		// ADD CONSTRAINT accepts only CHECK. ASSUME, an incomplete CHECK, and a
+		// missing CHECK or name stay syntax errors.
+		"ALTER TABLE t ADD CONSTRAINT c ASSUME x > 0",
+		"ALTER TABLE t ADD CONSTRAINT c CHECK",
+		"ALTER TABLE t ADD CONSTRAINT c",
+		"ALTER TABLE t ADD CONSTRAINT CHECK x > 0",
+		"ALTER TABLE t DROP CONSTRAINT c",
+		"ALTER TABLE t MODIFY CONSTRAINT c CHECK x > 0",
 		// A broken column value must report an error, not stop the parser
 		"CREATE TABLE t (x String DEFAULT CAST(a +, 'String'))",
 		"CREATE TABLE t (x String MATERIALIZED a +)",
@@ -273,6 +281,65 @@ func TestParser_InvalidSyntax(t *testing.T) {
 		_, err := parser.ParseStmts()
 		require.Error(t, err, "Expected error for SQL: %s", sql)
 	}
+}
+
+func TestParser_AlterTableAddConstraint(t *testing.T) {
+	// The service migration adds the source column, changes the sorting key,
+	// and adds the CHECK constraint in one statement.
+	const sql = "ALTER TABLE domain_events_v2 ADD COLUMN IF NOT EXISTS source_copy_id FixedString(32), MODIFY ORDER BY (scope_type, source_copy_id), ADD CONSTRAINT IF NOT EXISTS source_copy_id_present CHECK source_copy_id != toFixedString('', 32)"
+
+	stmts, err := NewParser(sql).ParseStmts()
+	require.NoError(t, err)
+	require.Len(t, stmts, 1)
+
+	alter, ok := stmts[0].(*AlterTable)
+	require.True(t, ok)
+	require.Len(t, alter.AlterExprs, 3)
+
+	clause, ok := alter.AlterExprs[2].(*AlterTableAddConstraint)
+	require.True(t, ok)
+	require.Equal(t, "ADD_CONSTRAINT", clause.AlterType())
+	require.True(t, clause.IfNotExists)
+	require.NotNil(t, clause.Constraint)
+	require.Equal(t, "source_copy_id_present", clause.Constraint.Constraint.Name)
+
+	check, ok := clause.Constraint.Expr.(*BinaryOperation)
+	require.True(t, ok)
+	require.Equal(t, TokenKindNE, check.Operation)
+	_, ok = check.RightExpr.(*FunctionExpr)
+	require.True(t, ok)
+
+	// The formatted statement keeps CHECK, so it parses again unchanged.
+	require.Equal(t, sql, Format(stmts[0]))
+
+	var visitorConstraint, visitorCheck bool
+	visitor := &DefaultASTVisitor{
+		Visit: func(expr Expr) error {
+			switch expr.(type) {
+			case *AlterTableAddConstraint:
+				visitorConstraint = true
+			case *BinaryOperation:
+				visitorCheck = true
+			}
+			return nil
+		},
+	}
+	require.NoError(t, stmts[0].Accept(visitor))
+	require.True(t, visitorConstraint, "the ADD CONSTRAINT clause was not visited")
+	require.True(t, visitorCheck, "the CHECK expression was not visited")
+
+	var walkConstraint, walkCheck bool
+	Walk(stmts[0], func(expr Expr) bool {
+		switch expr.(type) {
+		case *AlterTableAddConstraint:
+			walkConstraint = true
+		case *BinaryOperation:
+			walkCheck = true
+		}
+		return true
+	})
+	require.True(t, walkConstraint, "Walk did not reach the ADD CONSTRAINT clause")
+	require.True(t, walkCheck, "Walk did not reach the CHECK expression")
 }
 
 func TestParser_ParenthesizedSetOperationOperands(t *testing.T) {
