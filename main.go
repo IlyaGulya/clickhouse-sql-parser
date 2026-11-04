@@ -8,7 +8,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	clickhouse "github.com/AfterShip/clickhouse-sql-parser/parser"
+	clickhouse "github.com/IlyaGulya/clickhouse-sql-parser/parser"
 )
 
 // version is overridable at build time via
