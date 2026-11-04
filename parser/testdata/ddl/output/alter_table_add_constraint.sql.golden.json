@@ -1,0 +1,344 @@
+[
+  {
+    "AlterPos": 0,
+    "StatementEnd": 290,
+    "TableIdentifier": {
+      "Database": null,
+      "Table": {
+        "Name": "domain_events_v2",
+        "QuoteType": 1,
+        "NamePos": 12,
+        "NameEnd": 28
+      }
+    },
+    "OnCluster": null,
+    "AlterExprs": [
+      {
+        "AddPos": 33,
+        "StatementEnd": 87,
+        "Column": {
+          "NamePos": 58,
+          "ColumnEnd": 87,
+          "Name": {
+            "Ident": {
+              "Name": "source_copy_id",
+              "QuoteType": 1,
+              "NamePos": 58,
+              "NameEnd": 72
+            },
+            "DotIdent": null
+          },
+          "Type": {
+            "LeftParenPos": 85,
+            "RightParenPos": 87,
+            "Name": {
+              "Name": "FixedString",
+              "QuoteType": 1,
+              "NamePos": 73,
+              "NameEnd": 84
+            },
+            "Params": [
+              {
+                "NumPos": 85,
+                "NumEnd": 87,
+                "Literal": "32",
+                "Base": 10
+              }
+            ]
+          },
+          "NotNull": null,
+          "Nullable": null,
+          "DefaultExpr": null,
+          "MaterializedExpr": null,
+          "AliasExpr": null,
+          "Codec": null,
+          "TTL": null,
+          "Comment": null,
+          "CompressionCodec": null
+        },
+        "IfNotExists": true,
+        "After": null,
+        "Settings": null
+      },
+      {
+        "ModifyPos": 94,
+        "StatementEnd": 179,
+        "OrderBy": {
+          "LeftParenPos": 110,
+          "RightParenPos": 179,
+          "Items": {
+            "ListPos": 111,
+            "ListEnd": 179,
+            "HasDistinct": false,
+            "Items": [
+              {
+                "Expr": {
+                  "Name": "scope_type",
+                  "QuoteType": 1,
+                  "NamePos": 111,
+                  "NameEnd": 121
+                },
+                "Alias": null
+              },
+              {
+                "Expr": {
+                  "Name": "scope_key",
+                  "QuoteType": 1,
+                  "NamePos": 123,
+                  "NameEnd": 132
+                },
+                "Alias": null
+              },
+              {
+                "Expr": {
+                  "Name": "drain_cursor",
+                  "QuoteType": 1,
+                  "NamePos": 134,
+                  "NameEnd": 146
+                },
+                "Alias": null
+              },
+              {
+                "Expr": {
+                  "Name": "idempotency_key",
+                  "QuoteType": 1,
+                  "NamePos": 148,
+                  "NameEnd": 163
+                },
+                "Alias": null
+              },
+              {
+                "Expr": {
+                  "Name": "source_copy_id",
+                  "QuoteType": 1,
+                  "NamePos": 165,
+                  "NameEnd": 179
+                },
+                "Alias": null
+              }
+            ]
+          },
+          "ColumnArgList": null
+        }
+      },
+      {
+        "AddPos": 186,
+        "StatementEnd": 290,
+        "Constraint": {
+          "ConstraintPos": 190,
+          "Constraint": {
+            "Name": "source_copy_id_present",
+            "QuoteType": 1,
+            "NamePos": 215,
+            "NameEnd": 237
+          },
+          "Expr": {
+            "LeftExpr": {
+              "Name": "source_copy_id",
+              "QuoteType": 1,
+              "NamePos": 252,
+              "NameEnd": 266
+            },
+            "Operation": "!=",
+            "RightExpr": {
+              "Name": {
+                "Name": "toFixedString",
+                "QuoteType": 1,
+                "NamePos": 270,
+                "NameEnd": 283
+              },
+              "Params": {
+                "LeftParenPos": 283,
+                "RightParenPos": 290,
+                "Items": {
+                  "ListPos": 285,
+                  "ListEnd": 290,
+                  "HasDistinct": false,
+                  "Items": [
+                    {
+                      "Expr": {
+                        "LiteralPos": 285,
+                        "LiteralEnd": 285,
+                        "Literal": ""
+                      },
+                      "Alias": null
+                    },
+                    {
+                      "Expr": {
+                        "NumPos": 288,
+                        "NumEnd": 290,
+                        "Literal": "32",
+                        "Base": 10
+                      },
+                      "Alias": null
+                    }
+                  ]
+                },
+                "ColumnArgList": null
+              }
+            },
+            "HasGlobal": false,
+            "HasNot": false
+          }
+        },
+        "IfNotExists": true
+      }
+    ]
+  },
+  {
+    "AlterPos": 295,
+    "StatementEnd": 406,
+    "TableIdentifier": {
+      "Database": null,
+      "Table": {
+        "Name": "domain_events_v2",
+        "QuoteType": 1,
+        "NamePos": 307,
+        "NameEnd": 323
+      }
+    },
+    "OnCluster": null,
+    "AlterExprs": [
+      {
+        "AddPos": 324,
+        "StatementEnd": 406,
+        "Constraint": {
+          "ConstraintPos": 328,
+          "Constraint": {
+            "Name": "source_copy_id_present",
+            "QuoteType": 1,
+            "NamePos": 339,
+            "NameEnd": 361
+          },
+          "Expr": {
+            "LeftExpr": {
+              "Name": "source_copy_id",
+              "QuoteType": 1,
+              "NamePos": 368,
+              "NameEnd": 382
+            },
+            "Operation": "!=",
+            "RightExpr": {
+              "Name": {
+                "Name": "toFixedString",
+                "QuoteType": 1,
+                "NamePos": 386,
+                "NameEnd": 399
+              },
+              "Params": {
+                "LeftParenPos": 399,
+                "RightParenPos": 406,
+                "Items": {
+                  "ListPos": 401,
+                  "ListEnd": 406,
+                  "HasDistinct": false,
+                  "Items": [
+                    {
+                      "Expr": {
+                        "LiteralPos": 401,
+                        "LiteralEnd": 401,
+                        "Literal": ""
+                      },
+                      "Alias": null
+                    },
+                    {
+                      "Expr": {
+                        "NumPos": 404,
+                        "NumEnd": 406,
+                        "Literal": "32",
+                        "Base": 10
+                      },
+                      "Alias": null
+                    }
+                  ]
+                },
+                "ColumnArgList": null
+              }
+            },
+            "HasGlobal": false,
+            "HasNot": false
+          }
+        },
+        "IfNotExists": false
+      }
+    ]
+  },
+  {
+    "AlterPos": 410,
+    "StatementEnd": 535,
+    "TableIdentifier": {
+      "Database": null,
+      "Table": {
+        "Name": "domain_events_v2",
+        "QuoteType": 1,
+        "NamePos": 422,
+        "NameEnd": 438
+      }
+    },
+    "OnCluster": null,
+    "AlterExprs": [
+      {
+        "AddPos": 439,
+        "StatementEnd": 535,
+        "Constraint": {
+          "ConstraintPos": 443,
+          "Constraint": {
+            "Name": "source_copy_id_present",
+            "QuoteType": 1,
+            "NamePos": 468,
+            "NameEnd": 490
+          },
+          "Expr": {
+            "LeftExpr": {
+              "Name": "source_copy_id",
+              "QuoteType": 1,
+              "NamePos": 497,
+              "NameEnd": 511
+            },
+            "Operation": "!=",
+            "RightExpr": {
+              "Name": {
+                "Name": "toFixedString",
+                "QuoteType": 1,
+                "NamePos": 515,
+                "NameEnd": 528
+              },
+              "Params": {
+                "LeftParenPos": 528,
+                "RightParenPos": 535,
+                "Items": {
+                  "ListPos": 530,
+                  "ListEnd": 535,
+                  "HasDistinct": false,
+                  "Items": [
+                    {
+                      "Expr": {
+                        "LiteralPos": 530,
+                        "LiteralEnd": 530,
+                        "Literal": ""
+                      },
+                      "Alias": null
+                    },
+                    {
+                      "Expr": {
+                        "NumPos": 533,
+                        "NumEnd": 535,
+                        "Literal": "32",
+                        "Base": 10
+                      },
+                      "Alias": null
+                    }
+                  ]
+                },
+                "ColumnArgList": null
+              }
+            },
+            "HasGlobal": false,
+            "HasNot": false
+          }
+        },
+        "IfNotExists": true
+      }
+    ]
+  }
+]

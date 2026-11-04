@@ -260,6 +260,16 @@ func (a *AlterTableAddIndex) FormatSQL(formatter *Formatter) {
 	}
 }
 
+func (a *AlterTableAddConstraint) FormatSQL(formatter *Formatter) {
+	formatter.WriteString("ADD CONSTRAINT ")
+	if a.IfNotExists {
+		formatter.WriteString("IF NOT EXISTS ")
+	}
+	formatter.WriteExpr(a.Constraint.Constraint)
+	formatter.WriteString(" CHECK ")
+	formatter.WriteExpr(a.Constraint.Expr)
+}
+
 func (a *AlterTableAddProjection) FormatSQL(formatter *Formatter) {
 	formatter.WriteString("ADD PROJECTION ")
 	if a.IfNotExists {

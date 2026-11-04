@@ -91,9 +91,47 @@ func (p *Parser) parseAlterTableAdd(pos Pos) (AlterTableClause, error) {
 		return p.parseAlterTableAddIndex(pos)
 	case p.matchKeyword(KeywordProjection):
 		return p.parseAlterTableAddProjection(pos)
+	case p.matchKeyword(KeywordConstraint):
+		return p.parseAlterTableAddConstraint(pos)
 	default:
-		return nil, errors.New("expected token: COLUMN|INDEX|PROJECTION")
+		return nil, errors.New("expected token: COLUMN|INDEX|PROJECTION|CONSTRAINT")
 	}
+}
+
+// parseAlterTableAddConstraint parses ADD CONSTRAINT (IF NOT EXISTS)? name CHECK expr.
+func (p *Parser) parseAlterTableAddConstraint(pos Pos) (*AlterTableAddConstraint, error) {
+	constraintPos := p.Pos()
+	if err := p.expectKeyword(KeywordConstraint); err != nil {
+		return nil, err
+	}
+
+	ifNotExists, err := p.tryParseIfNotExists()
+	if err != nil {
+		return nil, err
+	}
+
+	name, err := p.parseIdent()
+	if err != nil {
+		return nil, err
+	}
+	if err := p.expectKeyword(KeywordCheck); err != nil {
+		return nil, err
+	}
+	expr, err := p.parseExpr(p.Pos())
+	if err != nil {
+		return nil, err
+	}
+
+	return &AlterTableAddConstraint{
+		AddPos:       pos,
+		StatementEnd: expr.End(),
+		IfNotExists:  ifNotExists,
+		Constraint: &ConstraintClause{
+			ConstraintPos: constraintPos,
+			Constraint:    name,
+			Expr:          expr,
+		},
+	}, nil
 }
 
 func (p *Parser) parseAlterTableAddColumn(pos Pos) (*AlterTableAddColumn, error) {

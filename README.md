@@ -7,6 +7,17 @@ The goal of this project is to build a ClickHouse SQL parser in Go with the foll
 - Beautify ClickHouse SQL format
 
 This project is inspired by [memefish](https://github.com/cloudspannerecosystem/memefish) which is a SQL parser for Spanner in Go.
+
+## CHECK constraints
+
+The parser accepts `ALTER TABLE ... ADD CONSTRAINT [IF NOT EXISTS] name CHECK expression`.
+The statement can also add a column and change `ORDER BY` in the same operation.
+Formatting keeps `CHECK`. Both traversal methods visit the check expression.
+`ASSUME`, `DROP CONSTRAINT`, and `MODIFY CONSTRAINT` are not supported.
+
+Custom `ASTVisitor` implementations must add `VisitAlterTableAddConstraint`.
+Implementations that embed `DefaultASTVisitor` inherit this method.
+
 ## How to use
 
 You can use it as your Go library or CLI tool, see the following examples:
